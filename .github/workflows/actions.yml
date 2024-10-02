@@ -1,7 +1,9 @@
-name: Build and Deploy of Static Site
+name: Build and Deploy to GitHub Pages
 
 on:
   push:
+    branches:
+      - main  # Убедитесь, что деплой будет происходить при пуше в основную ветку
 
 jobs:
   build:
@@ -9,28 +11,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Шаг 1: Клонирование репозитория
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Python Setup
+      # Шаг 2: Установка Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.12
 
-      - name: Mkdocs Setup
-        uses: pip install mkdocs
-
-      - name: Build
-        run: mkdocs build
-
-      - name: Install SSH key
-
+      # Шаг 3: Установка зависимостей (MkDocs и необходимые плагины)
+      - name: Install MkDocs and Dependencies
         run: |
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_ed25519
-          echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          pip install mkdocs
+          pip install mkdocs-material  # если используете тему Material
 
-      - name: Deploy
-        run: rsync --archive -- stats site/ ${{ secrets.REMOTE_DEST }}
-        
+      # Шаг 4: Сборка сайта
+      - name: Build site
+        run: mkdocs build --strict
+
+      # Шаг 5: Деплой на GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # Автоматический токен для доступа к репозиторию
+          publish_dir: ./site  # Путь к папке с собранным сайтом (из MkDocs)
 
