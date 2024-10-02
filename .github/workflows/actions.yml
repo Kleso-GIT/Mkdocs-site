@@ -22,22 +22,43 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
+  # Single deploy job for deploying static site
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
+
+      # Установка Python и зависимостей для сборки сайта (если используете MkDocs)
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install mkdocs
+          pip install mkdocs-material  # Если используете тему Material
+
+      # Сборка сайта MkDocs
+      - name: Build the site
+        run: mkdocs build --strict
+
+      # Конфигурация GitHub Pages
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Upload artifact
+
+      # Загрузка артефактов (собранный сайт) для деплоя
+      - name: Upload site content
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          # Загружаем только сгенерированный сайт, который находится в директории ./site
+          path: './site'
+
+      # Деплой собранного сайта на GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
