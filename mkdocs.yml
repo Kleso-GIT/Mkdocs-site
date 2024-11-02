@@ -1,1 +1,19 @@
-site_name: My Docs
+site_name: Magnesium for Life
+site_description: "Сайт с информацией о пользе употребления магния"
+site_author: "Yulia Chikaleva"
+theme:
+  name: material
+  logo: assets/logo.png
+  palette:
+      scheme: default
+      primary: cyan
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Yuliya3003
+    - icon: fontawesome/brands/discord
+      link: https://discordapp.com/users/1275128848241131551/
+copyright: Copyright &copy; 2024 Yulia Chikaleva
+extra_css:
+  - stylesheets/extra.css
+
